@@ -17,14 +17,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.weatherandroidtif24.data.fakeCities
+import com.example.weatherandroidtif24.data.fakeCurrentWeather
+import com.example.weatherandroidtif24.model.City
+import com.example.weatherandroidtif24.model.CurrentWeather
+import kotlin.math.roundToInt
 
 @Composable
-fun WeatherScreen(modifier: Modifier = Modifier) {
-    CurrentWeatherCard(modifier = modifier)
+fun WeatherScreen(city: City, weather: CurrentWeather, modifier: Modifier = Modifier) {
+    CurrentWeatherCard(city = city, weather = weather, modifier = modifier)
 }
 
 @Composable
-fun CurrentWeatherCard(modifier: Modifier = Modifier) {
+fun CurrentWeatherCard(city: City, weather: CurrentWeather, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -34,14 +39,14 @@ fun CurrentWeatherCard(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "Lörrach", fontSize = 28.sp)
-            Text(text = "⛅", fontSize = 72.sp)
-            Text(text = "14 °C", fontSize = 48.sp)
+            Text(text = city.name, fontSize = 28.sp)
+            Text(text = weather.condition.emoji(), fontSize = 72.sp)
+            Text(text = "${weather.temperature.roundToInt()} °C", fontSize = 48.sp)
             Spacer(modifier = Modifier.height(16.dp))
             Row(modifier = Modifier.fillMaxWidth()) {
-                Text(text = "Wind: 8 km/h")
+                Text(text = "Wind: ${weather.windSpeed.roundToInt()} km/h")
                 Spacer(modifier = Modifier.weight(1f))
-                Text(text = "Teilweise bewölkt")
+                Text(text = weather.condition.label())
             }
         }
     }
@@ -50,5 +55,6 @@ fun CurrentWeatherCard(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun WeatherScreenPreview() {
-    WeatherScreen()
+    val city = fakeCities.first()
+    WeatherScreen(city = city, weather = fakeCurrentWeather.getValue(city.name))
 }
