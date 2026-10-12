@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.ui.Modifier
+import com.example.weatherandroidtif24.ui.WeatherScreen
 import com.example.weatherandroidtif24.ui.theme.WeatherAndroidTIF24Theme
 
 class MainActivity : ComponentActivity() {
@@ -12,6 +15,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             WeatherAndroidTIF24Theme {
+                // Abstand zu Statusleiste und Kamera-Aussparung
+                WeatherScreen(modifier = Modifier.safeDrawingPadding())
             }
         }
     }
