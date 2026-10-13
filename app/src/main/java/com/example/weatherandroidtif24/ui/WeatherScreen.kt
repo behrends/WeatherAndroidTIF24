@@ -12,8 +12,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,20 +35,43 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherScreen(city: City, weather: CurrentWeather, modifier: Modifier = Modifier) {
+    // State liegt hier, weil TopAppBar und Karte ihn beide brauchen (State Hoisting)
+    var useCelsius by rememberSaveable { mutableStateOf(true) }
+
     Scaffold(
         modifier = modifier,
-        topBar = { TopAppBar(title = { Text(text = city.name) }) },
+        topBar = {
+            TopAppBar(
+                title = { Text(text = city.name) },
+                actions = {
+                    UnitToggle(useCelsius = useCelsius, onToggle = { useCelsius = !useCelsius })
+                },
+            )
+        },
     ) { innerPadding ->
         CurrentWeatherCard(
             city = city,
             weather = weather,
+            useCelsius = useCelsius,
             modifier = Modifier.padding(innerPadding),
         )
     }
 }
 
 @Composable
-fun CurrentWeatherCard(city: City, weather: CurrentWeather, modifier: Modifier = Modifier) {
+fun UnitToggle(useCelsius: Boolean, onToggle: () -> Unit, modifier: Modifier = Modifier) {
+    TextButton(onClick = onToggle, modifier = modifier) {
+        Text(text = if (useCelsius) "°C" else "°F")
+    }
+}
+
+@Composable
+fun CurrentWeatherCard(
+    city: City,
+    weather: CurrentWeather,
+    useCelsius: Boolean,
+    modifier: Modifier = Modifier,
+) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -55,7 +83,7 @@ fun CurrentWeatherCard(city: City, weather: CurrentWeather, modifier: Modifier =
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = city.name, fontSize = 28.sp)
             Text(text = weather.condition.emoji(), fontSize = 72.sp)
-            Text(text = "${weather.temperature.roundToInt()} °C", fontSize = 48.sp)
+            Text(text = formatTemperature(weather.temperature, useCelsius), fontSize = 48.sp)
             Spacer(modifier = Modifier.height(16.dp))
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(text = "Wind: ${weather.windSpeed.roundToInt()} km/h")

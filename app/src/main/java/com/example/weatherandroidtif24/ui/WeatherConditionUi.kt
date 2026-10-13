@@ -1,6 +1,7 @@
 package com.example.weatherandroidtif24.ui
 
 import com.example.weatherandroidtif24.model.WeatherCondition
+import kotlin.math.roundToInt
 
 fun WeatherCondition.emoji(): String = when (this) {
     WeatherCondition.CLEAR -> "☀️"
@@ -21,3 +22,10 @@ fun WeatherCondition.label(): String = when (this) {
     WeatherCondition.SNOW -> "Schnee"
     WeatherCondition.THUNDERSTORM -> "Gewitter"
 }
+
+fun formatTemperature(celsius: Double, useCelsius: Boolean): String =
+    if (useCelsius) {
+        "${celsius.roundToInt()} °C"
+    } else {
+        "${(celsius * 9 / 5 + 32).roundToInt()} °F"
+    }
