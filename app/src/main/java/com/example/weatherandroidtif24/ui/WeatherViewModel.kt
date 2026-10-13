@@ -1,18 +1,37 @@
 package com.example.weatherandroidtif24.ui
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.weatherandroidtif24.data.FakeWeatherRepository
+import com.example.weatherandroidtif24.data.WeatherRepository
 import com.example.weatherandroidtif24.data.fakeCities
-import com.example.weatherandroidtif24.data.fakeCurrentWeather
+import com.example.weatherandroidtif24.model.City
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
-class WeatherViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow<WeatherUiState>(
-        WeatherUiState.Success(
-            city = fakeCities.first(),
-            weather = fakeCurrentWeather.getValue(fakeCities.first().name),
-        )
-    )
+class WeatherViewModel(
+    private val repository: WeatherRepository = FakeWeatherRepository(),
+) : ViewModel() {
+    private val _uiState = MutableStateFlow<WeatherUiState>(WeatherUiState.Loading)
     val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
+
+    init {
+        loadWeather(fakeCities.first())
+    }
+
+    fun loadWeather(city: City) {
+        _uiState.value = WeatherUiState.Loading
+        viewModelScope.launch {
+            _uiState.value = try {
+                WeatherUiState.Success(city, repository.getCurrentWeather(city))
+            } catch (e: CancellationException) {
+                throw e // Abbruch der Coroutine nicht als Fehler behandeln
+            } catch (e: Exception) {
+                WeatherUiState.Error(e.message ?: "Unbekannter Fehler")
+            }
+        }
+    }
 }

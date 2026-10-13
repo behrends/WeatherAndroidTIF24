@@ -49,7 +49,10 @@ fun WeatherScreen(
 // Stateless: zeigt nur an, was es bekommt (dadurch auch in der Preview nutzbar)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WeatherContent(uiState: WeatherUiState, modifier: Modifier = Modifier) {
+fun WeatherContent(
+    uiState: WeatherUiState,
+    modifier: Modifier = Modifier,
+) {
     // UI-Element-State: bleibt im Composable, gehört nicht ins ViewModel
     var useCelsius by rememberSaveable { mutableStateOf(true) }
 
@@ -142,5 +145,15 @@ fun WeatherContentPreview() {
 fun WeatherContentLoadingPreview() {
     WeatherAndroidTIF24Theme {
         WeatherContent(uiState = WeatherUiState.Loading)
+    }
+}
+
+@Preview(showBackground = true, name = "Error")
+@Composable
+fun WeatherContentErrorPreview() {
+    WeatherAndroidTIF24Theme {
+        WeatherContent(
+            uiState = WeatherUiState.Error("Keine Verbindung zum Server"),
+        )
     }
 }
