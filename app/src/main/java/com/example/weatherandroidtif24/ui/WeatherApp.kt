@@ -6,7 +6,6 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import com.example.weatherandroidtif24.data.fakeCities
 import com.example.weatherandroidtif24.model.City
 import kotlinx.serialization.Serializable
 
@@ -31,7 +30,6 @@ fun WeatherApp() {
         entryProvider = entryProvider {
             entry<CityList> {
                 CityListScreen(
-                    cities = fakeCities,
                     onCityClick = { city ->
                         weatherViewModel.loadWeather(city)
                         backStack.add(CityWeather(city))
