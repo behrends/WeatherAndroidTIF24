@@ -2,7 +2,7 @@ package com.example.weatherandroidtif24.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.weatherandroidtif24.data.FakeWeatherRepository
+import com.example.weatherandroidtif24.data.ApiWeatherRepository
 import com.example.weatherandroidtif24.data.WeatherRepository
 import com.example.weatherandroidtif24.model.City
 import kotlinx.coroutines.CancellationException
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class WeatherViewModel(
-    private val repository: WeatherRepository = FakeWeatherRepository(),
+    private val repository: WeatherRepository = ApiWeatherRepository(),
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<WeatherUiState>(WeatherUiState.Loading)
     val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
