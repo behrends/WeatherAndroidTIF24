@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -25,6 +27,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.weatherandroidtif24.data.fakeCities
 import com.example.weatherandroidtif24.data.fakeCurrentWeather
 import com.example.weatherandroidtif24.model.City
@@ -32,29 +36,57 @@ import com.example.weatherandroidtif24.model.CurrentWeather
 import com.example.weatherandroidtif24.ui.theme.WeatherAndroidTIF24Theme
 import kotlin.math.roundToInt
 
+// Stateful: holt den Zustand aus dem ViewModel
+@Composable
+fun WeatherScreen(
+    modifier: Modifier = Modifier,
+    viewModel: WeatherViewModel = viewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    WeatherContent(uiState = uiState, modifier = modifier)
+}
+
+// Stateless: zeigt nur an, was es bekommt (dadurch auch in der Preview nutzbar)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WeatherScreen(city: City, weather: CurrentWeather, modifier: Modifier = Modifier) {
-    // State liegt hier, weil TopAppBar und Karte ihn beide brauchen (State Hoisting)
+fun WeatherContent(uiState: WeatherUiState, modifier: Modifier = Modifier) {
+    // UI-Element-State: bleibt im Composable, gehört nicht ins ViewModel
     var useCelsius by rememberSaveable { mutableStateOf(true) }
 
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text(text = city.name) },
+                title = { Text(text = "Wetter") },
                 actions = {
                     UnitToggle(useCelsius = useCelsius, onToggle = { useCelsius = !useCelsius })
                 },
             )
         },
     ) { innerPadding ->
-        CurrentWeatherCard(
-            city = city,
-            weather = weather,
-            useCelsius = useCelsius,
-            modifier = Modifier.padding(innerPadding),
-        )
+        when (uiState) {
+            WeatherUiState.Loading -> CenteredBox(Modifier.padding(innerPadding)) {
+                CircularProgressIndicator()
+            }
+
+            is WeatherUiState.Success -> CurrentWeatherCard(
+                city = uiState.city,
+                weather = uiState.weather,
+                useCelsius = useCelsius,
+                modifier = Modifier.padding(innerPadding),
+            )
+
+            is WeatherUiState.Error -> CenteredBox(Modifier.padding(innerPadding)) {
+                Text(text = uiState.message)
+            }
+        }
+    }
+}
+
+@Composable
+fun CenteredBox(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        content()
     }
 }
 
@@ -96,9 +128,19 @@ fun CurrentWeatherCard(
 
 @Preview(showBackground = true)
 @Composable
-fun WeatherScreenPreview() {
+fun WeatherContentPreview() {
     val city = fakeCities.first()
     WeatherAndroidTIF24Theme {
-        WeatherScreen(city = city, weather = fakeCurrentWeather.getValue(city.name))
+        WeatherContent(
+            uiState = WeatherUiState.Success(city, fakeCurrentWeather.getValue(city.name)),
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Loading")
+@Composable
+fun WeatherContentLoadingPreview() {
+    WeatherAndroidTIF24Theme {
+        WeatherContent(uiState = WeatherUiState.Loading)
     }
 }
