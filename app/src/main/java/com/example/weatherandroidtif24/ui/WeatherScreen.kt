@@ -9,7 +9,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,11 +24,22 @@ import com.example.weatherandroidtif24.data.fakeCities
 import com.example.weatherandroidtif24.data.fakeCurrentWeather
 import com.example.weatherandroidtif24.model.City
 import com.example.weatherandroidtif24.model.CurrentWeather
+import com.example.weatherandroidtif24.ui.theme.WeatherAndroidTIF24Theme
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherScreen(city: City, weather: CurrentWeather, modifier: Modifier = Modifier) {
-    CurrentWeatherCard(city = city, weather = weather, modifier = modifier)
+    Scaffold(
+        modifier = modifier,
+        topBar = { TopAppBar(title = { Text(text = city.name) }) },
+    ) { innerPadding ->
+        CurrentWeatherCard(
+            city = city,
+            weather = weather,
+            modifier = Modifier.padding(innerPadding),
+        )
+    }
 }
 
 @Composable
@@ -56,5 +70,7 @@ fun CurrentWeatherCard(city: City, weather: CurrentWeather, modifier: Modifier =
 @Composable
 fun WeatherScreenPreview() {
     val city = fakeCities.first()
-    WeatherScreen(city = city, weather = fakeCurrentWeather.getValue(city.name))
+    WeatherAndroidTIF24Theme {
+        WeatherScreen(city = city, weather = fakeCurrentWeather.getValue(city.name))
+    }
 }
