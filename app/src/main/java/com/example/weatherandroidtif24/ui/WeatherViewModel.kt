@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherandroidtif24.data.FakeWeatherRepository
 import com.example.weatherandroidtif24.data.WeatherRepository
-import com.example.weatherandroidtif24.data.fakeCities
 import com.example.weatherandroidtif24.model.City
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,10 +16,6 @@ class WeatherViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<WeatherUiState>(WeatherUiState.Loading)
     val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
-
-    init {
-        loadWeather(fakeCities.first())
-    }
 
     fun loadWeather(city: City) {
         _uiState.value = WeatherUiState.Loading

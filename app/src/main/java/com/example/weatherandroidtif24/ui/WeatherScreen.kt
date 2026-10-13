@@ -39,17 +39,23 @@ import kotlin.math.roundToInt
 // Stateful: holt den Zustand aus dem ViewModel
 @Composable
 fun WeatherScreen(
+    city: City,
     modifier: Modifier = Modifier,
     viewModel: WeatherViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    WeatherContent(uiState = uiState, modifier = modifier)
+    WeatherContent(
+        city = city,
+        uiState = uiState,
+        modifier = modifier,
+    )
 }
 
 // Stateless: zeigt nur an, was es bekommt (dadurch auch in der Preview nutzbar)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherContent(
+    city: City,
     uiState: WeatherUiState,
     modifier: Modifier = Modifier,
 ) {
@@ -60,7 +66,7 @@ fun WeatherContent(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text(text = "Wetter") },
+                title = { Text(text = city.name) },
                 actions = {
                     UnitToggle(useCelsius = useCelsius, onToggle = { useCelsius = !useCelsius })
                 },
@@ -135,6 +141,7 @@ fun WeatherContentPreview() {
     val city = fakeCities.first()
     WeatherAndroidTIF24Theme {
         WeatherContent(
+            city = city,
             uiState = WeatherUiState.Success(city, fakeCurrentWeather.getValue(city.name)),
         )
     }
@@ -144,7 +151,10 @@ fun WeatherContentPreview() {
 @Composable
 fun WeatherContentLoadingPreview() {
     WeatherAndroidTIF24Theme {
-        WeatherContent(uiState = WeatherUiState.Loading)
+        WeatherContent(
+            city = fakeCities.first(),
+            uiState = WeatherUiState.Loading,
+        )
     }
 }
 
@@ -153,6 +163,7 @@ fun WeatherContentLoadingPreview() {
 fun WeatherContentErrorPreview() {
     WeatherAndroidTIF24Theme {
         WeatherContent(
+            city = fakeCities.first(),
             uiState = WeatherUiState.Error("Keine Verbindung zum Server"),
         )
     }

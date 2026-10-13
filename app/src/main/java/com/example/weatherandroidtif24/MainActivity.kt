@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.weatherandroidtif24.ui.WeatherScreen
+import com.example.weatherandroidtif24.ui.WeatherApp
 import com.example.weatherandroidtif24.ui.theme.WeatherAndroidTIF24Theme
 
 class MainActivity : ComponentActivity() {
@@ -13,7 +13,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             WeatherAndroidTIF24Theme {
-                WeatherScreen()
+                WeatherApp()
             }
         }
     }
